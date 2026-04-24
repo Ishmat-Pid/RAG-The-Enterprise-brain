@@ -1,11 +1,12 @@
-
 import os
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
-from langchain.chains.retrieval_qa.base import RetrievalQA
+
+# UPDATED IMPORT FOR 2026
+from langchain.chains.retrieval_qa.base import RetrievalQA 
 
 load_dotenv()
 
