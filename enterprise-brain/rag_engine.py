@@ -4,6 +4,12 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
+<<<<<<< HEAD
+=======
+
+# UPDATED IMPORT FOR 2026
+from langchain.chains.retrieval_qa.base import RetrievalQA 
+>>>>>>> origin/main
 
 load_dotenv()
 
