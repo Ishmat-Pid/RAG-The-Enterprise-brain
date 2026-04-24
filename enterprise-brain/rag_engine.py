@@ -4,10 +4,6 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.chains import create_retrieval_chain
-from langchain_core.prompts import ChatPromptTemplate
-# REMOVED: from langchain.chains import RetrievalQA  ← You're not using this!
 
 load_dotenv()
 
@@ -20,6 +16,7 @@ class EnterpriseBrain:
     def process_pdf(self, file_path):
         loader = PyPDFLoader(file_path)
         docs = loader.load()
+        
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         chunks = text_splitter.split_documents(docs)
         
@@ -33,19 +30,17 @@ class EnterpriseBrain:
     def ask_question(self, question):
         if not self.vector_db:
             return "Please upload a document first."
+        
+        docs = self.vector_db.similarity_search(question, k=3)
+        context = "\n\n".join([doc.page_content for doc in docs])
+        
+        prompt = f"""Answer based only on this context:
 
-        # Modern RAG Prompt
-        prompt = ChatPromptTemplate.from_template("""
-        Answer the following question based only on the provided context:
-        <context>
-        {context}
-        </context>
-        Question: {input}""")
+{context}
 
-        # Create the modern chain logic
-        document_chain = create_stuff_documents_chain(self.llm, prompt)
-        retriever = self.vector_db.as_retriever()
-        retrieval_chain = create_retrieval_chain(retriever, document_chain)
+Question: {question}
 
-        response = retrieval_chain.invoke({"input": question})
-        return response["answer"]
+Answer:"""
+        
+        response = self.llm.invoke(prompt)
+        return response.content
